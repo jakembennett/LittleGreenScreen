@@ -9,8 +9,13 @@ cap = cv2.VideoCapture(0)
 detector = cv2.QRCodeDetector()
 
 def close_and_open_chromium(url):
-    # Close all instances of Chromium
-    subprocess.run(["pkill", "chromium-browser"])
+    # Check if pkill is available
+    if subprocess.run(["command", "-v", "pkill"], capture_output=True).returncode == 0:
+        # Close all instances of Chromium using pkill
+        subprocess.run(["pkill", "chromium-browser"])
+    else:
+        # Alternative method to kill Chromium if pkill is not available
+        subprocess.run(["killall", "chromium-browser"])
     time.sleep(1)  # Give it a second to close
 
     # Open a new Chromium tab with the specified URL
@@ -25,7 +30,7 @@ while True:
     data, bbox, _ = detector.detectAndDecode(img)
     
     # Draw a blue box around the data and write the data on the image
-    if(bbox is not None):
+    if bbox is not None:
         for i in range(len(bbox)):
             cv2.line(img, tuple(bbox[i][0]), tuple(bbox[(i + 1) % len(bbox)][0]), color=(255, 0, 0), thickness=2)
         cv2.putText(img, data, (int(bbox[0][0][0]), int(bbox[0][0][1]) - 10), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 250, 120), 2)
@@ -35,8 +40,14 @@ while True:
             print("data found: ", data)
             if "https://www.littlegreenoffice.net/staff/littlegreenscreen.php" in data:
                 close_and_open_chromium(data)
-                # Stop scanning for 5 seconds
+                # Pause to ensure Chromium opens properly and not rescan until a new QR code is found
                 time.sleep(5)
+                # Wait for the next QR code
+                while True:
+                    _, img = cap.read()
+                    data, bbox, _ = detector.detectAndDecode(img)
+                    if bbox is not None:
+                        break
             else:
                 print("Invalid URL detected")
     
@@ -44,7 +55,7 @@ while True:
     cv2.imshow("code detector", img)
     
     # Check if 'q' key is pressed to exit the loop
-    if(cv2.waitKey(1) == ord("q")):
+    if cv2.waitKey(1) == ord("q"):
         break
     
 # When the code is stopped, close all the applications/windows that the above has created
