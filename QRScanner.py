@@ -1,6 +1,7 @@
 import cv2
 import time
 import subprocess
+import shutil
 
 # Set up camera object called Cap which we will use to find OpenCV
 cap = cv2.VideoCapture(0)
@@ -10,12 +11,15 @@ detector = cv2.QRCodeDetector()
 
 def close_and_open_chromium(url):
     # Check if pkill is available
-    if subprocess.run(["command", "-v", "pkill"], capture_output=True).returncode == 0:
+    if shutil.which("pkill") is not None:
         # Close all instances of Chromium using pkill
         subprocess.run(["pkill", "chromium-browser"])
-    else:
+    elif shutil.which("killall") is not None:
         # Alternative method to kill Chromium if pkill is not available
         subprocess.run(["killall", "chromium-browser"])
+    else:
+        print("No method available to kill Chromium")
+        return
     time.sleep(1)  # Give it a second to close
 
     # Open a new Chromium tab with the specified URL
