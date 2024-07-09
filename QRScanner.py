@@ -15,6 +15,8 @@ detector = cv2.QRCodeDetector()
 # Set up Selenium options
 chrome_options = Options()
 chrome_options.add_argument("--start-maximized")
+chrome_options.add_argument('--no-sandbox')
+chrome_options.add_argument('--disable-dev-shm-usage')
 
 def open_chromium_with_url(url):
     # Initialize the Chrome driver
