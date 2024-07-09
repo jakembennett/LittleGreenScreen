@@ -1,7 +1,10 @@
 import cv2
 import time
-import subprocess
-import shutil
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
 
 # Set up camera object called Cap which we will use to find OpenCV
 cap = cv2.VideoCapture(0)
@@ -9,23 +12,22 @@ cap = cv2.VideoCapture(0)
 # QR code detection Method
 detector = cv2.QRCodeDetector()
 
-def close_and_open_chromium(url):
-    # Check if pkill is available
-    if shutil.which("pkill") is not None:
-        # Close all instances of Chromium using pkill
-        subprocess.run(["pkill", "chromium-browser"])
-    elif shutil.which("killall") is not None:
-        # Alternative method to kill Chromium if pkill is not available
-        subprocess.run(["killall", "chromium-browser"])
-    else:
-        print("No method available to kill Chromium")
-        return
-    time.sleep(1)  # Give it a second to close
+# Set up Selenium options
+chrome_options = Options()
+chrome_options.add_argument("--start-maximized")
 
-    # Open a new Chromium tab with the specified URL
-    subprocess.run(["chromium-browser", url])
+def open_chromium_with_url(url):
+    # Initialize the Chrome driver
+    driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=chrome_options)
+    driver.get(url)
+    return driver
+
+def close_chromium(driver):
+    # Close the browser
+    driver.quit()
 
 # Infinite loop to keep your camera searching for data at all times
+driver = None
 while True:
     # Method to get an image from the QR code
     _, img = cap.read()
@@ -43,7 +45,9 @@ while True:
         if data:
             print("data found: ", data)
             if "https://www.littlegreenoffice.net/staff/littlegreenscreen.php" in data:
-                close_and_open_chromium(data)
+                if driver:
+                    close_chromium(driver)
+                driver = open_chromium_with_url(data)
                 # Pause to ensure Chromium opens properly and not rescan until a new QR code is found
                 time.sleep(5)
                 # Wait for the next QR code
@@ -51,6 +55,7 @@ while True:
                     _, img = cap.read()
                     data, bbox, _ = detector.detectAndDecode(img)
                     if bbox is not None:
+                        print("New QR code detected, resuming operation")
                         break
             else:
                 print("Invalid URL detected")
@@ -61,7 +66,9 @@ while True:
     # Check if 'q' key is pressed to exit the loop
     if cv2.waitKey(1) == ord("q"):
         break
-    
+
 # When the code is stopped, close all the applications/windows that the above has created
 cap.release()
 cv2.destroyAllWindows()
+if driver:
+    close_chromium(driver)
