@@ -14,7 +14,7 @@ def close_and_open_chromium(url):
     time.sleep(1)  # Give it a second to close
 
     # Open a new Chromium tab with the specified URL
-    subprocess.run(["chromium-browser", url])
+    subprocess.run(["chromium-browser", "--no-sandbox", url])
 
 # Infinite loop to keep your camera searching for data at all times
 while True:
