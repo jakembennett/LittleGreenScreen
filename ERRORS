@@ -1,0 +1,6 @@
+[1490:1646:0712/113656.935242:ERROR:object_proxy.cc(621)] Failed to call method: org.freedesktop.DBus.Properties.Get: object_path= /org/freedesktop/UPower: org.freedesktop.DBus.Error.ServiceUnknown: The name org.freedesktop.UPower was not provided by any .service files
+[1490:1646:0712/113656.936503:ERROR:object_proxy.cc(621)] Failed to call method: org.freedesktop.UPower.GetDisplayDevice: object_path= /org/freedesktop/UPower: org.freedesktop.DBus.Error.ServiceUnknown: The name org.freedesktop.UPower was not provided by any .service files
+[1490:1646:0712/113656.937454:ERROR:object_proxy.cc(621)] Failed to call method: org.freedesktop.UPower.EnumerateDevices: object_path= /org/freedesktop/UPower: org.freedesktop.DBus.Error.ServiceUnknown: The name org.freedesktop.UPower was not provided by any .service files
+[1534:1534:0712/113659.591093:ERROR:gl_surface_presentation_helper.cc(259)] GetVSyncParametersIfAvailable() failed for 1 times!
+[1534:1534:0712/113720.614718:ERROR:gl_surface_presentation_helper.cc(259)] GetVSyncParametersIfAvailable() failed for 2 times!
+[1534:1534:0712/113726.101615:ERROR:gl_surface_presentation_helper.cc(259)] GetVSyncParametersIfAvailable() failed for 3 times!
